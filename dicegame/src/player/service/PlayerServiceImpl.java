@@ -59,7 +59,7 @@ public class PlayerServiceImpl implements PlayerService {
                 playerList.get(currentIdx).getSpecialDiceNumber();
     }
 
-    private int howMuchCanWeSteal (int myDiceNumber, int targetDiceNumber) {
+    private int howMuchCanWeSteal (int targetDiceNumber) {
         final int STEAL_SCORE = 3;
 
         if (targetDiceNumber - STEAL_SCORE >= 0) {
@@ -81,7 +81,11 @@ public class PlayerServiceImpl implements PlayerService {
 
             int targetDiceNumber = calcTotalDiceNumber(playerList, i);
 
-            myDiceNumber += howMuchCanWeSteal(myDiceNumber, targetDiceNumber);
+            myDiceNumber += howMuchCanWeSteal(targetDiceNumber);
+
+            targetDiceNumber -= howMuchCanWeSteal(targetDiceNumber);
+
+            playerList.get(i).setTotalDiceScore(targetDiceNumber);
         }
 
         playerList.get(currentIdx).setTotalDiceScore(myDiceNumber);
@@ -141,13 +145,48 @@ public class PlayerServiceImpl implements PlayerService {
                 donateToEachPlayer(playerList, currentIdx);
 
             if (dicePattern == SpecialDicePattern.PATTERN_BUDDY_FUCKER)
-                ;
+                minusEachPlayerScore(playerList);
 
             if (dicePattern == SpecialDicePattern.PATTERN_NOTHING) {
                 playerList.get(currentIdx).setTotalDiceScore(
                         calcTotalDiceNumber(playerList, currentIdx));
             }
 
+    }
+
+    private int howMuchCanWeMinus (int targetDiceNumber) {
+        final int SCORE_MINUS = 2;
+
+        if (targetDiceNumber - SCORE_MINUS >= 0) {
+            return SCORE_MINUS;
+        } else if (targetDiceNumber == 0) {
+            System.out.println("감소시킬 점수가 없음");
+            return 0;
+        } else {
+            return targetDiceNumber;
+        }
+    }
+
+    private void minusEachPlayerScore(List<Player> playerList) {
+        for (int i = 0; i < playerList.size(); i++) {
+            int targetDiceNumber = calcTotalDiceNumber(playerList, i); //플레이어 i 의 점수
+            targetDiceNumber -= howMuchCanWeMinus(targetDiceNumber);
+            playerList.get(i).setTotalDiceScore(targetDiceNumber);
+        }
+    }
+
+    private void minusEachPlayerScore1 (List<Player> playerList, int currentIdx) {
+
+        int myDiceNumber = calcTotalDiceNumber(playerList, currentIdx);
+
+        for (int i = 0; i < playerList.size(); i++) {
+
+            int targetDiceNumber = calcTotalDiceNumber(playerList, i);
+
+            myDiceNumber += howMuchCanWeMinus(targetDiceNumber);
+        }
+
+        playerList.get(currentIdx).setTotalDiceScore(myDiceNumber);
     }
 
     private void applyEachPlayer (List<Player> playerList, int currentIdx) {
