@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    final public static int PLAYER_MAX = 3;
+    final public static int PLAYER_MAX = 5;
 
     public static void main(String[] args) {
         PlayerService playerService = new PlayerServiceImpl();
